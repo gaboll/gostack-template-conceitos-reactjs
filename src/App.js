@@ -6,7 +6,6 @@ import "./styles.css";
 
 function App() {
   const [repositories, setRepositories] = useState([]);
-  const [title, setTitle] = useState("");
 
   useEffect(() => {
     async function loadRepositories() {
@@ -16,43 +15,42 @@ function App() {
     };
 
     loadRepositories();
-  }, [repositories]);
+  }, []);
 
   async function handleAddRepository() {
-    api.post('/repositories', {
-      title,
+    const response = await api.post('/repositories', {
+      title: "Desafio ReactJS",
       url: "",
       techs: []
     });
 
-    setTitle('')
-  }
+    setRepositories([...repositories, response.data]);
+  };
 
   async function handleRemoveRepository(id) {
     api.delete(`/repositories/${id}`);
-  }
+
+    setRepositories(repositories.filter(repository => repository.id !== id));
+  };
 
   return (
     <div>
       <ul data-testid="repository-list">
-        {repositories.map(repository => (
-          <li key={repository.id}>
-            {repository.title}
+        {repositories.map(repository => {
+          return (
+            <li key={repository.id}>
+              {repository.title}
 
-            <button onClick={() => handleRemoveRepository(repository.id)}>
-              Remover
+              <button onClick={() => handleRemoveRepository(repository.id)}>
+                Remover
         </button>
-          </li>
-        ))}
+            </li>
+          )
+        })}
       </ul>
 
       <button onClick={handleAddRepository}>Adicionar</button>
       <div className="input-container">
-        <input
-          placeholder="Título do Repositório"
-          value={title}
-          onChange={e => setTitle(e.target.value)}
-        />
       </div>
     </div>
   );
